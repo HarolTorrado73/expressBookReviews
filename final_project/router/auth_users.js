@@ -22,25 +22,15 @@ const authenticatedUser = (username,password)=>{
   return validusers.length > 0;
 }
 
-//only registered users can login
+
 regd_users.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-
-  if (!username || !password) {
-      return res.status(404).json({message: "Error al iniciar sesión"});
-  }
-
-  // Usamos la función isValid que suele venir en el esqueleto
   if (authenticatedUser(username, password)) {
-    let accessToken = jwt.sign({
-      data: password
-    }, 'access', { expiresIn: 60 * 60 });
-
-    req.session.authorization = {
-      accessToken, username
-    }
-    return res.status(200).send("Usuario ha iniciado sesión exitosamente");
+    let accessToken = jwt.sign({ data: password }, 'access', { expiresIn: 60 * 60 });
+    req.session.authorization = { accessToken, username };
+    // EL CAMBIO ESTÁ AQUÍ (JSON):
+    return res.status(200).json({message: "Usuario ha iniciado sesión exitosamente"});
   } else {
     return res.status(208).json({message: "Credenciales inválidas"});
   }
